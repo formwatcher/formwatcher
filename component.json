@@ -4,9 +4,21 @@
   "description": "Unobtrusively improve forms with JavaScript.",
   "version": "2.1.10-dev",
   "keywords": [ "form", "formwatcher", "hint", "unobtrusive" ],
-  "dependencies": { },
+  "dependencies": {
+    "formwatcher/bonzo": "*",
+    "formwatcher/qwery": "*",
+    "formwatcher/domready": "*",
+    "formwatcher/bean": "*",
+    "formwatcher/reqwest": "*",
+    "enyo/json": "*"
+  },
   "development": {},
   "scripts": [
-    "index.js", "lib/formwatcher.js", "lib/validators.js"
+    "index.js",
+    "lib/formwatcher.js",
+    "lib/watcher.js",
+    "lib/input-watcher.js",
+    "lib/validator.js",
+    "lib/decorator.js"
   ]
 }
