@@ -59,30 +59,34 @@ class Watcher
     @observe "complete", @options.onComplete
 
     for input in qwery(inputSelector, @form)
-      input = bonzo input
-      unless input.fwData("initialized")
-        if input.attr("type") is "hidden"
-          input.fwData "forceSubmission", true
+      binput = bonzo input
+      unless binput.fwData("initialized")
+        if binput.attr("type") is "hidden"
+          binput.fwData "forceSubmission", true
         else
           elements = Formwatcher.decorate @, input
-          if elements.input.get() isnt input.get()
-            elements.input.attr "class", input.attr("class")
+          if elements.input isnt input
+            bonzo(elements.input).attr "class", binput.attr("class")
             input = elements.input
+            binput = bonzo elements.input
+
           unless elements.label
-            label = Formwatcher.getLabel(elements, @options.automatchLabel)
-            elements.label = label  if label
+            label = Formwatcher.getLabel elements, @options.automatchLabel
+            elements.label = label if label
+
           unless elements.errors
             errorsElement = Formwatcher.getErrorsElement elements, true
             elements.errors = errorsElement
+
           @allElements.push elements
-          input.fwData "validators", []
+          binput.fwData "validators", []
           for validator in @validators
             if validator.accepts input, @
-              Formwatcher.debug "Validator \"" + validator.name + "\" found for input field \"" + input.attr("name") + "\"."
-              input.fwData("validators").push validator
+              Formwatcher.debug "Validator '#{validator.name}' found for input field '#{binput.attr("name")}'."
+              binput.fwData("validators").push validator
 
           Formwatcher.storeInitialValue elements
-          if input.val() is null or not input.val()
+          if binput.val() is null or not binput.val()
             bonzo(element).addClass "empty" for i, element of elements
 
           Formwatcher.removeName elements unless @options.submitUnchanged
@@ -105,19 +109,19 @@ class Watcher
 
     for element in submitButtons
       do (element) =>
+        belement = bonzo element
         bean.on element, "click", (e) =>
-          element = bonzo element
-          if element[0].tagName == "BUTTON"
+          if element.tagName == "BUTTON"
             # That's a IE7 bugfix: The `value` attribute of buttons in IE7 is always the content if a content is present.
-            tmpElementText = element.text()
-            element.text ""
-            elementValue = element.val() ? ""
-            element.text tmpElementText
+            tmpElementText = belement.text()
+            belement.text ""
+            elementValue = belement.val() ? ""
+            belement.text tmpElementText
           else
-            elementValue = element.val() ? ""
+            elementValue = belement.val() ? ""
 
           # The submit buttons click events are always triggered if a user presses ENTER inside an input field.
-          bonzo(hiddenSubmitButtonElement).attr("name", element.attr("name") or "").val elementValue
+          bonzo(hiddenSubmitButtonElement).attr("name", belement.attr("name") or "").val elementValue
           @submitForm()
           e.stopPropagation()
 
@@ -167,7 +171,7 @@ class Watcher
 
   # `inlineValidating` specifies whether the user is still in the element, typing.
   validateElements: (elements, inlineValidating) ->
-    input = elements.input
+    input = bonzo elements.input
     validated = true
     if input.fwData("validators").length
       # Only revalidated if the value has changed
@@ -192,8 +196,9 @@ class Watcher
         if validated
           elements.errors.html("").hide()
           for own i, element of elements
-            element.addClass "validated"
-            element.removeClass "error"
+            bonzo(element)
+              .addClass("validated")
+              .removeClass("error")
 
           # When we remove an error during inline editing, the error has to
           # be shown again when the user leaves the input field, even if
@@ -202,11 +207,11 @@ class Watcher
 
         else
 
-          element.removeClass "validated" for own i, element of elements
+          bonzo(element).removeClass "validated" for own i, element of elements
 
           unless inlineValidating
-            elements.errors.html(input.fwData("validationErrors").join("<br />")).show()
-            element.addClass "error" for own i, element of elements
+            bonzo(elements.errors).html(input.fwData("validationErrors").join("<br />")).show()
+            bonzo(element).addClass "error" for own i, element of elements
 
       if not inlineValidating and validated
         sanitizedValue = input.fwData("lastValidatedValue")
@@ -215,7 +220,7 @@ class Watcher
 
         input.val sanitizedValue
     else
-      element.addClass "validated" for own i, element of elements
+      bonzo(element).addClass "validated" for own i, element of elements
 
     validated
 
@@ -275,7 +280,8 @@ class Watcher
         Formwatcher.restoreInitialValue elements
       else
         Formwatcher.storeInitialValue elements
-      isEmpty = (elements.input.val() is null or not elements.input.val())
+      input = bonzo elements.input
+      isEmpty = (input.val() is null or not input.val())
       for i, element of elements
         element = bonzo element
         if isEmpty
