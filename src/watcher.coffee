@@ -59,48 +59,51 @@ class Watcher
     @observe "complete", @options.onComplete
 
     for input in qwery(inputSelector, @form)
-      binput = bonzo input
-      unless binput.fwData("initialized")
-        if binput.attr("type") is "hidden"
-          binput.fwData "forceSubmission", true
-        else
-          elements = Formwatcher.decorate @, input
-          if elements.input isnt input
-            bonzo(elements.input).attr "class", binput.attr("class")
-            input = elements.input
-            binput = bonzo elements.input
+      do (input) =>
+        binput = bonzo input
+        unless binput.fwData("initialized")
+          binput.fwData "initialized", yes
 
-          unless elements.label
-            label = Formwatcher.getLabel elements, @options.automatchLabel
-            elements.label = label if label
+          if binput.attr("type") is "hidden"
+            binput.fwData "forceSubmission", true
+          else
+            elements = Formwatcher.decorate @, input
+            if elements.input isnt input
+              bonzo(elements.input).attr "class", binput.attr("class")
+              input = elements.input
+              binput = bonzo elements.input
 
-          unless elements.errors
-            errorsElement = Formwatcher.getErrorsElement elements, true
-            elements.errors = errorsElement
+            unless elements.label
+              label = Formwatcher.getLabel elements, @options.automatchLabel
+              elements.label = label if label
 
-          @allElements.push elements
-          binput.fwData "validators", []
-          for validator in @validators
-            if validator.accepts input, @
-              Formwatcher.debug "Validator '#{validator.name}' found for input field '#{binput.attr("name")}'."
-              binput.fwData("validators").push validator
+            unless elements.errors
+              errorsElement = Formwatcher.getErrorsElement elements, true
+              elements.errors = errorsElement
 
-          Formwatcher.storeInitialValue elements
-          if binput.val() is null or not binput.val()
-            bonzo(element).addClass "empty" for i, element of elements
+            @allElements.push elements
+            binput.fwData "validators", []
+            for validator in @validators
+              if validator.accepts input, @
+                Formwatcher.debug "Validator '#{validator.name}' found for input field '#{binput.attr("name")}'."
+                binput.fwData("validators").push validator
 
-          Formwatcher.removeName elements unless @options.submitUnchanged
+            Formwatcher.storeInitialValue elements
+            if binput.val() is null or not binput.val()
+              bonzo(element).addClass "empty" for i, element of elements
 
-          onchangeFunction = => Formwatcher.changed elements, @
-          validateElementsFunction = => @validateElements elements, true
+            Formwatcher.removeName elements unless @options.submitUnchanged
 
-          for i, element of elements
-            do (element) ->
-              bean.on element, "focus", => bonzo(element).addClass "focus"
-              bean.on element, "blur", => bonzo(element).removeClass "focus"
-              bean.on element, "change", onchangeFunction
-              bean.on element, "blur", onchangeFunction
-              bean.on element, "keyup", validateElementsFunction
+            onchangeFunction = => Formwatcher.changed elements, @
+            validateElementsFunction = => @validateElements elements, true
+
+            for i, element of elements
+              do (element) ->
+                bean.on element, "focus", => bonzo(element).addClass "focus"
+                bean.on element, "blur", => bonzo(element).removeClass "focus"
+                bean.on element, "change", onchangeFunction
+                bean.on element, "blur", onchangeFunction
+                bean.on element, "keyup", validateElementsFunction
 
     submitButtons = qwery "input[type=submit], button[type=''], button[type='submit'], button:not([type])", @form
     hiddenSubmitButtonElement = bonzo.create('<input type="hidden" name="" value="" />')[0]
@@ -161,8 +164,6 @@ class Watcher
   validateForm: ->
     validated = true
 
-    # Not using _.detect() here, because I want every element to be inspected, even
-    # if the first one fails.
     for elements in @allElements
       validated = false unless @validateElements(elements)
 
