@@ -277,6 +277,7 @@ class Watcher
         Formwatcher.storeInitialValue elements
       isEmpty = (elements.input.val() is null or not elements.input.val())
       for i, element of elements
+        element = bonzo element
         if isEmpty
           element.addClass "empty"
         else
