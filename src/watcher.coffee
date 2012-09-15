@@ -91,13 +91,12 @@ class Watcher
           validateElementsFunction = => @validateElements elements, true
 
           for i, element of elements
-            ((element) ->
+            do (element) ->
               bean.on element, "focus", => bonzo(element).addClass "focus"
               bean.on element, "blur", => bonzo(element).removeClass "focus"
               bean.on element, "change", onchangeFunction
               bean.on element, "blur", onchangeFunction
               bean.on element, "keyup", validateElementsFunction
-            )(element)
 
     submitButtons = qwery "input[type=submit], button[type=''], button[type='submit'], button:not([type])", @form
     hiddenSubmitButtonElement = bonzo.create('<input type="hidden" name="" value="" />')[0]
@@ -105,21 +104,22 @@ class Watcher
     @bonzoForm.append hiddenSubmitButtonElement
 
     for element in submitButtons
-      element = bonzo element
-      element.click (e) =>
-        if element[0].tagName == "BUTTON"
-          # That's a IE7 bugfix: The `value` attribute of buttons in IE7 is always the content if a content is present.
-          tmpElementText = element.text()
-          element.text ""
-          elementValue = element.val() ? ""
-          element.text tmpElementText
-        else
-          elementValue = element.val() ? ""
+      do (element) =>
+        bean.on element, "click", (e) =>
+          element = bonzo element
+          if element[0].tagName == "BUTTON"
+            # That's a IE7 bugfix: The `value` attribute of buttons in IE7 is always the content if a content is present.
+            tmpElementText = element.text()
+            element.text ""
+            elementValue = element.val() ? ""
+            element.text tmpElementText
+          else
+            elementValue = element.val() ? ""
 
-        # The submit buttons click events are always triggered if a user presses ENTER inside an input field.
-        bonzo(hiddenSubmitButtonElement).attr("name", element.attr("name") or "").val elementValue
-        @submitForm()
-        e.stopPropagation()
+          # The submit buttons click events are always triggered if a user presses ENTER inside an input field.
+          bonzo(hiddenSubmitButtonElement).attr("name", element.attr("name") or "").val elementValue
+          @submitForm()
+          e.stopPropagation()
 
   callObservers: (eventName, args...) ->
     observer.apply @, args for observer in @observers[eventName]
