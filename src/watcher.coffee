@@ -172,26 +172,26 @@ class Watcher
 
   # `inlineValidating` specifies whether the user is still in the element, typing.
   validateElements: (elements, inlineValidating) ->
-    input = bonzo elements.input
+    binput = bonzo elements.input
     validated = true
-    if input.fwData("validators").length
+    if binput.fwData("validators").length
       # Only revalidated if the value has changed
-      if not inlineValidating or not input.fwData("lastValidatedValue") or input.fwData("lastValidatedValue") isnt input.val()
-        input.fwData "lastValidatedValue", input.val()
-        Formwatcher.debug "Validating input " + input.attr("name")
-        input.fwData "validationErrors", []
+      if not inlineValidating or not binput.fwData("lastValidatedValue") or binput.fwData("lastValidatedValue") isnt binput.val()
+        binput.fwData "lastValidatedValue", binput.val()
+        Formwatcher.debug "Validating input " + binput.attr("name")
+        binput.fwData "validationErrors", []
 
-        for validator in input.fwData "validators"
+        for validator in binput.fwData "validators"
 
-          if input.val() is "" and validator.name isnt "Required"
+          if binput.val() is "" and validator.name isnt "Required"
             Formwatcher.debug "Validating " + validator.name + ". Field was empty so continuing."
             continue
 
           Formwatcher.debug "Validating " + validator.name
-          validationOutput = validator.validate(validator.sanitize(input.val()), input)
+          validationOutput = validator.validate(validator.sanitize(binput.val()), elements.input)
           if validationOutput isnt true
             validated = false
-            input.fwData("validationErrors").push validationOutput
+            binput.fwData("validationErrors").push validationOutput
             break
 
         if validated
@@ -204,22 +204,22 @@ class Watcher
           # When we remove an error during inline editing, the error has to
           # be shown again when the user leaves the input field, even if
           # the actual value has not changed.
-          elements.input.fwData "forceValidationOnChange", true  if inlineValidating
+          binput.fwData "forceValidationOnChange", true  if inlineValidating
 
         else
 
           bonzo(element).removeClass "validated" for own i, element of elements
 
           unless inlineValidating
-            bonzo(elements.errors).html(input.fwData("validationErrors").join("<br />")).show()
+            bonzo(elements.errors).html(binput.fwData("validationErrors").join("<br />")).show()
             bonzo(element).addClass "error" for own i, element of elements
 
       if not inlineValidating and validated
-        sanitizedValue = input.fwData("lastValidatedValue")
-        for validator in input.fwData("validators")
+        sanitizedValue = binput.fwData("lastValidatedValue")
+        for validator in binput.fwData("validators")
           sanitizedValue = validator.sanitize(sanitizedValue)
 
-        input.val sanitizedValue
+        binput.val sanitizedValue
     else
       bonzo(element).addClass "validated" for own i, element of elements
 
