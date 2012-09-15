@@ -1,4 +1,7 @@
 
+# Dependencies
+bonzo = require "bonzo"
+
 # ## The InputWatcher root class
 # 
 # This is the base class for decorators and validators.
@@ -21,7 +24,7 @@ class InputWatcher
     return false if @watcher.options[@name]? and @watcher.options[@name] == false
 
     correctNodeName = false
-    inputNodeName = input.get(0).nodeName
+    inputNodeName = input.nodeName
 
     for nodeName in @nodeNames
       if inputNodeName is nodeName
@@ -33,7 +36,7 @@ class InputWatcher
     correctClassNames = true
 
     for className in @classNames
-      unless input.hasClass className
+      unless bonzo(input).hasClass className
         correctClassNames = false
         break
 
