@@ -194,7 +194,7 @@ class Watcher
             break
 
         if validated
-          elements.errors.html("").hide()
+          bonzo(elements.errors).html("").hide()
           for own i, element of elements
             bonzo(element)
               .addClass("validated")
