@@ -103,10 +103,10 @@ Formwatcher =
       parent = input.parent()
       if parent.nodeName == "LABEL"
         # The input is embedded inside a label, so take the first span element.
-        label = bonzo(qwery("span", parent)).first()
+        label = qwery("span", parent)[0]
         label = undefined if label.length == 0
       else
-        label = input.previous()
+        label = input.previous()[0]
         label = undefined if !label.length or label.nodeName isnt "LABEL" or bonzo(label).attr("for")?
 
     label
@@ -245,7 +245,7 @@ Formwatcher =
       # domOptions always overwrite the normal options.
       options = @deepExtend options, JSON.parse domOptions if domOptions
 
-      new @Watcher(form.first(), options)
+      new @Watcher(form, options)
 
     domready ->
       bonzo(qwery("form[data-fw]")).each (form) -> handleForm form

@@ -26,7 +26,7 @@ class Watcher
     else if @bonzoForm.get(0).nodeName isnt "FORM"
       throw "The element was not a form."
 
-    @form = @bonzoForm.first()
+    @form = @bonzoForm[0]
 
     @allElements = [ ]
     @id = Formwatcher.currentWatcherId++
