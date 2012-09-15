@@ -1,17 +1,32 @@
 
+# Dependencies
+Formwatcher = require "./formwatcher"
+bonzo = require "bonzo"
+qwery = require "qwery"
+reqwest = require "reqwest"
+bean = require "bean"
+
+
+
+# The selector for all input types
+inputSelector = "input, textarea, select, button"
+
+
 # ## The Watcher class
 #
 # This is the class that gets instantiated for each form.
 class Watcher
   constructor: (form, options) ->
-    @form = if typeof form is "string" then $("##{form}") else $ form
+    @bonzoForm = if typeof form is "string" then bonzo(qwery(form)) else bonzo(form)
 
-    if @form.length < 1
+    if @bonzoForm.length < 1
       throw "Form element not found."
-    else if @form.length > 1
+    else if @bonzoForm.length > 1
       throw "More than one form was found."
-    else if @form.get(0).nodeName isnt "FORM"
+    else if @bonzoForm.get(0).nodeName isnt "FORM"
       throw "The element was not a form."
+
+    @form = @bonzoForm.first()
 
     @allElements = [ ]
     @id = Formwatcher.currentWatcherId++
@@ -19,8 +34,8 @@ class Watcher
     @observers = { }
 
     # Putting the watcher object in the form element.
-    @form.fwData "watcher", @
-    @form.fwData("originalAction", @form.attr("action") or "").attr "action", "javascript:undefined;"
+    @bonzoForm.fwData "watcher", @
+    @bonzoForm.fwData("originalAction", @bonzoForm.attr("action") or "").attr "action", "javascript:undefined;"
     @options = Formwatcher.deepExtend { }, Formwatcher.defaultOptions, options or { }
     @decorators = [ ]
     @validators = [ ]
@@ -29,7 +44,7 @@ class Watcher
     @validators.push new Validator @ for Validator in Formwatcher.validators
 
 
-    @options.ajaxMethod = @form.attr("method")?.toLowerCase() if @options.ajaxMethod == null
+    @options.ajaxMethod = @bonzoForm.attr("method")?.toLowerCase() if @options.ajaxMethod == null
 
     switch @options.ajaxMethod
       when "post", "put", "delete"
@@ -43,8 +58,8 @@ class Watcher
     @observe "error", @options.onError
     @observe "complete", @options.onComplete
 
-    $(inputSelector, @form).each (input) =>
-      input = $ input
+    for input in qwery(inputSelector, @form)
+      input = bonzo input
       unless input.fwData("initialized")
         if input.attr("type") is "hidden"
           input.fwData "forceSubmission", true
@@ -68,7 +83,7 @@ class Watcher
 
           Formwatcher.storeInitialValue elements
           if input.val() is null or not input.val()
-            element.addClass "empty" for i, element of elements
+            bonzo(element).addClass "empty" for i, element of elements
 
           Formwatcher.removeName elements unless @options.submitUnchanged
 
@@ -77,18 +92,20 @@ class Watcher
 
           for i, element of elements
             ((element) ->
-              element.on "focus", => element.addClass "focus"
-              element.on "blur", => element.removeClass "focus"
-              element.on "change", onchangeFunction
-              element.on "blur", onchangeFunction
-              element.on "keyup", validateElementsFunction
+              bean.on element, "focus", => bonzo(element).addClass "focus"
+              bean.on element, "blur", => bonzo(element).removeClass "focus"
+              bean.on element, "change", onchangeFunction
+              bean.on element, "blur", onchangeFunction
+              bean.on element, "keyup", validateElementsFunction
             )(element)
 
-    submitButtons = $ "input[type=submit], button[type=''], button[type='submit'], button:not([type])", @form
-    hiddenSubmitButtonElement = $.create '<input type="hidden" name="" value="" />'
-    @form.append hiddenSubmitButtonElement
-    submitButtons.each (element) =>
-      element = $ element
+    submitButtons = qwery "input[type=submit], button[type=''], button[type='submit'], button:not([type])", @form
+    hiddenSubmitButtonElement = bonzo.create('<input type="hidden" name="" value="" />')[0]
+
+    @bonzoForm.append hiddenSubmitButtonElement
+
+    for element in submitButtons
+      element = bonzo element
       element.click (e) =>
         if element[0].tagName == "BUTTON"
           # That's a IE7 bugfix: The `value` attribute of buttons in IE7 is always the content if a content is present.
@@ -100,7 +117,7 @@ class Watcher
           elementValue = element.val() ? ""
 
         # The submit buttons click events are always triggered if a user presses ENTER inside an input field.
-        hiddenSubmitButtonElement.attr("name", element.attr("name") or "").val elementValue
+        bonzo(hiddenSubmitButtonElement).attr("name", element.attr("name") or "").val elementValue
         @submitForm()
         e.stopPropagation()
 
@@ -116,22 +133,21 @@ class Watcher
     @observers[eventName] = (observer for observer in @observers[eventName] when observer isnt func)
     @
 
-  enableForm: -> $(inputSelector, @form).removeAttr "disabled"
+  enableForm: -> bonzo(qwery(inputSelector, @form)).removeAttr "disabled"
 
-  disableForm: -> $(inputSelector, @form).attr "disabled", "disabled"
+  disableForm: -> bonzo(qwery(inputSelector, @form)).attr "disabled", "disabled"
 
   submitForm: (e) ->
     if not @options.validate or @validateForm()
       @callObservers "submit"
 
-
       # Do submit
-      @form.addClass "submitting"
+      @bonzoForm.addClass "submitting"
       if @options.ajax
         @disableForm()
         @submitAjax()
       else
-        @form.attr "action", @form.fwData("originalAction")
+        @bonzoForm.attr "action", @bonzoForm.fwData("originalAction")
         setTimeout =>
           @form.submit()
           @disableForm()
@@ -209,8 +225,8 @@ class Watcher
     fieldCount = 0
     i = 0
 
-    $(inputSelector, @form).each (input, i) =>
-      input = $ input
+    for input, i in qwery(inputSelector, @form)
+      input = bonzo input
 
       # Buttons are only submitted when pressed. If a submit button triggers the submission
       # of the form then it creates a hidden input field to transmit it.
@@ -234,8 +250,8 @@ class Watcher
         @ajaxSuccess()
       , 1
     else
-      $.ajax
-        url: @form.fwData("originalAction")
+      reqwest
+        url: @bonzoForm.fwData("originalAction")
         method: @options.ajaxMethod
         data: fields
         type: "text"
@@ -249,7 +265,7 @@ class Watcher
             @callObservers "success", request.response
             @ajaxSuccess()
         complete: (request) =>
-          @form.removeClass "submitting"
+          @bonzoForm.removeClass "submitting"
           @callObservers "complete", request.response
 
   ajaxSuccess: ->

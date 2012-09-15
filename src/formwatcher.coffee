@@ -48,12 +48,7 @@ bonzo.aug
       return @
     else
       return formwatcherAttributes[name]
-  , true
 
-
-
-# The selector for all input types
-inputSelector = "input, textarea, select, button"
 
 
 # ## Formwatcher, the global namespace
@@ -202,7 +197,7 @@ Formwatcher =
 
   decorators: []
   # `decorate()` only uses the first decorator found. You can't use multiple decorators on the same input.
-  # If you want to have two decorators applied, you have to create a new decorator joining them.
+  # You can extend an existing decorator with inheritence though.
   decorate: (watcher, input) ->
     decorator = null
 
@@ -213,7 +208,7 @@ Formwatcher =
         break
 
     if decorator
-      Formwatcher.debug "Decorator \"" + decorator.name + "\" found for input field \"" + input.attr("name") + "\"."
+      Formwatcher.debug "Decorator '#{decorator.name}' found for input field '#{input.attr("name")}'."
       decorator.decorate input
     else
       input: input
@@ -230,8 +225,10 @@ Formwatcher =
   getAll: ->
     @watchers
 
-  # Searches all forms with a data-fw attribute and watches them
-  scanDocument: ->
+  # Searches all forms with a data-fw attribute and watches them.
+  # 
+  # This method delays the scan until the dom is loaded.
+  discover: ->
     handleForm = (form) =>
       form = bonzo form
 
@@ -248,14 +245,14 @@ Formwatcher =
       # domOptions always overwrite the normal options.
       options = @deepExtend options, JSON.parse domOptions if domOptions
 
-      new Watcher(form.first(), options)
+      new @Watcher(form.first(), options)
 
-    bonzo(qwery("form[data-fw]")).each (form) -> handleForm form
+    domready ->
+      bonzo(qwery("form[data-fw]")).each (form) -> handleForm form
+      handleForm qwery("##{formId}") for formId of Formwatcher.options
 
-    handleForm qwery("##{formId}") for formId of Formwatcher.options
-
-  watch: (form, options) ->
-    domready -> new Watcher form, options
+  watch: (args...) ->
+    domready -> new @Watcher args...
 
 
 
@@ -327,5 +324,3 @@ Formwatcher.options = { }
 # Exposing the main Formwatcher object
 module.exports = Formwatcher
 
-
-domready -> Formwatcher.scanDocument()
