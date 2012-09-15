@@ -104,10 +104,9 @@ Formwatcher =
       if parent.nodeName == "LABEL"
         # The input is embedded inside a label, so take the first span element.
         label = qwery("span", parent)[0]
-        label = undefined if label.length == 0
       else
         label = input.previous()[0]
-        label = undefined if !label.length or label.nodeName isnt "LABEL" or bonzo(label).attr("for")?
+        label = undefined if label and (label.nodeName isnt "LABEL" or bonzo(label).attr("for")?)
 
     label
 
