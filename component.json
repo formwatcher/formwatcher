@@ -1,0 +1,12 @@
+{
+  "name": "formwatcher",
+  "repo": "formwatcher/formwatcher",
+  "description": "Unobtrusively improve forms with JavaScript.",
+  "version": "2.1.10-dev",
+  "keywords": [ "form", "formwatcher", "hint", "unobtrusive" ],
+  "dependencies": { },
+  "development": {},
+  "scripts": [
+    "index.js", "lib/formwatcher.js", "lib/validators.js"
+  ]
+}
