@@ -107,7 +107,7 @@ Formwatcher =
         label = undefined if label.length == 0
       else
         label = input.previous()
-        label = undefined if !label.length or label.get(0).nodeName isnt "LABEL" or label.attr("for")?
+        label = undefined if !label.length or label.nodeName isnt "LABEL" or bonzo(label).attr("for")?
 
     label
 
