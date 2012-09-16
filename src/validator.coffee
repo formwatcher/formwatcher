@@ -24,7 +24,12 @@ class Validator extends InputWatcher
   # 
   # Normally this is just the sanitized value as string so it calls
   # the `sanitize()` function.
-  format: (value) -> "#{@sanitize value}"
+  format: (value) ->
+    sanitizedValue = @sanitize value
+    if isNaN(sanitizedValue) or !sanitizedValue
+      ""
+    else
+      "#{sanitizedValue}"
 
 
 
