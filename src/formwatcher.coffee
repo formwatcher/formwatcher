@@ -68,7 +68,7 @@ Formwatcher =
     errors = qwery("##{input.attr('id')}-errors") unless errors?.length or !input.attr("id")
 
     if not errors or not errors.length
-      errors = bonzo.create "<small />"
+      errors = bonzo.create("<small />")[0]
       bonzo(errors).attr "id", input.attr("name") + "-errors" if input.attr("name")
       bonzo(errors).insertAfter input
 
@@ -96,7 +96,7 @@ Formwatcher =
     input = bonzo elements.input
 
     if input.attr("id")
-      label = bonzo bonzo.create "label[for=" + input.attr("id") + "]"
+      label = bonzo bonzo.create("label[for=" + input.attr("id") + "]")[0]
       label = undefined unless label.length
 
     if not label and automatchLabel
