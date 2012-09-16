@@ -84,7 +84,7 @@ class Watcher
             binput.fwData "validators", []
             for validator in @validators
               # If the config for a validator is just false, it's disabled
-              return false if @watcher.options[@name]? and @watcher.options[@name] == false
+              return false if @options[@name]? and @options[@name] == false
 
               if (!@options[validator.name]? or @options[validator.name] isnt false) and validator.accepts input, @
                 Formwatcher.debug "Validator '#{validator.name}' found for input field '#{binput.attr("name")}'."
