@@ -128,25 +128,46 @@ You can directly configure decorators or validators inside this JSON object:
 
 ## Writing your own Validators
 
-Adding a validator is very easy. You just push a new instance of `Formwatcher.Validator` to the `Formwatcher.validators`
-list.
+Writing validators is very easy. A validator is a class that gets an `options`
+object and a `Watcher` instance in the constructor. The instance must have the
+field `name` and respond to the methods `accepts`, `validate`  and `format`.
 
-As an example, the `required` validator:
+To activate a validator it has to be pushed onto the `Formwatcher.validators`
+array.
 
-    # ## Required validator
-    #
-    # If it's a checkbox, it has to be checked. Otherwise the value can't be 0 or an empty string (whitespace is trimmed)
-    Formwatcher.validators.push class extends Formwatcher.Validator
-      name: "Required"
-      description: "Makes sure the value is not blank (nothing or spaces)."
-      classNames: [ "required" ]
-      validate: (value, input) ->
-        return "Can not be blank." if (input.attr("type") is "checkbox" and not input.is(":checked")) or not trim value
-        true
+A simple JavaScript implementation could look like this:
 
-If the `validate()` funciton returns a string, the validation failed, and the string is used as error message.
+```javascript
+function myValidator(options, watcher) {
+  this.options = options;
+  this.watcher = watcher;
+}
 
-If `true` is returned, the validation passed.
+myValidator.prototype.name = "only-helloworld";
+
+myValidator.prototype.accepts = function(input) {
+  return input.className.indexOf("validate-only-hello-world") != -1;
+};
+
+/**
+ * Returns an error string on error, or true on success.
+ */
+myValidator.prototype.validate = function(value, input) {
+  if (value === "Hello world") return true
+  return "Did not contain hello world!";
+};
+
+myValidator.prototype.format = function(value) {
+  return value.toUpperCase();
+};
+
+require("formwatcher").push(myValidator);
+
+```
+
+If you write your validator in coffeescript you can benefit from the
+`Formwatcher.Validator` class by simply extending it and overwrite your
+functions. Please look at the source to see how it works.
 
 
 ## Writing your own Decorators

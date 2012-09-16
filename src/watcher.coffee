@@ -40,9 +40,8 @@ class Watcher
     @decorators = [ ]
     @validators = [ ]
 
-    @decorators.push new Decorator @ for Decorator in Formwatcher.decorators
-    @validators.push new Validator @ for Validator in Formwatcher.validators
-
+    @decorators.push new Decorator @options[Decorator::name] ? { }, @ for Decorator in Formwatcher.decorators
+    @validators.push new Validator @options[Validator::name] ? { }, @ for Validator in Formwatcher.validators
 
     @options.ajaxMethod = @bonzoForm.attr("method")?.toLowerCase() if @options.ajaxMethod == null
 
@@ -84,7 +83,10 @@ class Watcher
             @allElements.push elements
             binput.fwData "validators", []
             for validator in @validators
-              if validator.accepts input, @
+              # If the config for a validator is just false, it's disabled
+              return false if @watcher.options[@name]? and @watcher.options[@name] == false
+
+              if (!@options[validator.name]? or @options[validator.name] isnt false) and validator.accepts input, @
                 Formwatcher.debug "Validator '#{validator.name}' found for input field '#{binput.attr("name")}'."
                 binput.fwData("validators").push validator
 
@@ -184,11 +186,11 @@ class Watcher
         for validator in binput.fwData "validators"
 
           if binput.val() is "" and validator.name isnt "Required"
-            Formwatcher.debug "Validating " + validator.name + ". Field was empty so continuing."
+            Formwatcher.debug "Validating #{validator.name}. Field was empty so continuing."
             continue
 
-          Formwatcher.debug "Validating " + validator.name
-          validationOutput = validator.validate(validator.sanitize(binput.val()), elements.input)
+          Formwatcher.debug "Validating #{validator.name}"
+          validationOutput = validator.validate(binput.val(), elements.input)
           if validationOutput isnt true
             validated = false
             binput.fwData("validationErrors").push validationOutput
@@ -215,11 +217,11 @@ class Watcher
             bonzo(element).addClass "error" for own i, element of elements
 
       if not inlineValidating and validated
-        sanitizedValue = binput.fwData("lastValidatedValue")
+        formattedValue = binput.fwData("lastValidatedValue")
         for validator in binput.fwData("validators")
-          sanitizedValue = validator.sanitize(sanitizedValue)
+          formattedValue = validator.format(formattedValue)
 
-        binput.val sanitizedValue
+        binput.val formattedValue
     else
       bonzo(element).addClass "validated" for own i, element of elements
 

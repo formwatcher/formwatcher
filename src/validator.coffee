@@ -10,13 +10,21 @@ class Validator extends InputWatcher
   nodeNames: [ "INPUT", "TEXTAREA", "SELECT" ]
 
   # Return true if the validation passed, or an error message if not.
-  validate: (sanitizedValue, input) -> true
+  validate: (value, input) -> true
 
-  # If your value can be sanitized (eg: integers should not have leading or trailing spaces)
-  # this function should return the sanitized value.
-  #
-  # When the user leaves the input field, the value will be updated with this value in the field.
+  # Since most validators sanitize their values to validate and format the default
+  # validator has a helper sanitize function that can be used so `format()`
+  # doesn't have to implemented every time.
   sanitize: (value) -> value
+
+  # When the user leaves the input field, the value will be updated with this
+  # formatted value.
+  # 
+  # **This only happens when the validation was successful!**
+  # 
+  # Normally this is just the sanitized value as string so it calls
+  # the `sanitize()` function.
+  format: (value) -> "#{@sanitize value}"
 
 
 

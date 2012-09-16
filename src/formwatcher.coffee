@@ -200,9 +200,8 @@ Formwatcher =
   decorate: (watcher, input) ->
     decorator = null
 
-    # Like `_.detect()`
     for dec in watcher.decorators
-      if dec.accepts input
+      if (!watcher.options[dec.name]? or watcher.options[dec.name] isnt false) and dec.accepts input
         decorator = dec
         break
 
