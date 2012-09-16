@@ -26,7 +26,8 @@ class Validator extends InputWatcher
   # the `sanitize()` function.
   format: (value) ->
     sanitizedValue = @sanitize value
-    if isNaN(sanitizedValue) or !sanitizedValue
+    # NaN != NaN so using this here, because isNaN is true on strings.
+    if (sanitizedValue != sanitizedValue) or !sanitizedValue
       ""
     else
       "#{sanitizedValue}"
