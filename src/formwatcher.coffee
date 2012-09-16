@@ -206,7 +206,7 @@ Formwatcher =
         break
 
     if decorator
-      Formwatcher.debug "Decorator '#{decorator.name}' found for input field '#{input.attr("name")}'."
+      Formwatcher.debug "Decorator '#{decorator.name}' found for input field '#{bonzo(input).attr("name")}'."
       decorator.decorate input
     else
       input: input
