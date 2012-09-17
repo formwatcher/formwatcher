@@ -17,16 +17,16 @@ inputSelector = "input, textarea, select, button"
 # This is the class that gets instantiated for each form.
 class Watcher
   constructor: (form, options) ->
-    @bonzoForm = if typeof form is "string" then bonzo(qwery(form)) else bonzo(form)
+    @$form = if typeof form is "string" then bonzo(qwery(form)) else bonzo(form)
 
-    if @bonzoForm.length < 1
+    if @$form.length < 1
       throw "Form element not found."
-    else if @bonzoForm.length > 1
+    else if @$form.length > 1
       throw "More than one form was found."
-    else if @bonzoForm.get(0).nodeName isnt "FORM"
+    else if @$form.get(0).nodeName isnt "FORM"
       throw "The element was not a form."
 
-    @form = @bonzoForm[0]
+    @form = @$form[0]
 
     @allElements = [ ]
     @id = Formwatcher.currentWatcherId++
@@ -34,8 +34,8 @@ class Watcher
     @observers = { }
 
     # Putting the watcher object in the form element.
-    @bonzoForm.fwData "watcher", @
-    @bonzoForm.fwData("originalAction", @bonzoForm.attr("action") or "").attr "action", "javascript:undefined;"
+    @$form.fwData "watcher", @
+    @$form.fwData("originalAction", @$form.attr("action") or "").attr "action", "javascript:undefined;"
     @options = Formwatcher.deepExtend { }, Formwatcher.defaultOptions, options or { }
     @decorators = [ ]
     @validators = [ ]
@@ -43,7 +43,7 @@ class Watcher
     @decorators.push new Decorator @options[Decorator::name] ? { }, @ for Decorator in Formwatcher.decorators
     @validators.push new Validator @options[Validator::name] ? { }, @ for Validator in Formwatcher.validators
 
-    @options.ajaxMethod = @bonzoForm.attr("method")?.toLowerCase() if @options.ajaxMethod == null
+    @options.ajaxMethod = @$form.attr("method")?.toLowerCase() if @options.ajaxMethod == null
 
     switch @options.ajaxMethod
       when "post", "put", "delete"
@@ -59,18 +59,18 @@ class Watcher
 
     for input in qwery(inputSelector, @form)
       do (input) =>
-        binput = bonzo input
-        unless binput.fwData("initialized")
-          binput.fwData "initialized", yes
+        $input = bonzo input
+        unless $input.fwData("initialized")
+          $input.fwData "initialized", yes
 
-          if binput.attr("type") is "hidden"
-            binput.fwData "forceSubmission", true
+          if $input.attr("type") is "hidden"
+            $input.fwData "forceSubmission", true
           else
             elements = Formwatcher.decorate @, input
             if elements.input isnt input
-              bonzo(elements.input).attr "class", binput.attr("class")
+              bonzo(elements.input).attr "class", $input.attr("class")
               input = elements.input
-              binput = bonzo elements.input
+              $input = bonzo elements.input
 
             unless elements.label
               label = Formwatcher.getLabel elements, @options.automatchLabel
@@ -81,17 +81,17 @@ class Watcher
               elements.errors = errorsElement
 
             @allElements.push elements
-            binput.fwData "validators", []
+            $input.fwData "validators", []
             for validator in @validators
               # If the config for a validator is just false, it's disabled
               return false if @options[@name]? and @options[@name] == false
 
               if (!@options[validator.name]? or @options[validator.name] isnt false) and validator.accepts input, @
-                Formwatcher.debug "Validator '#{validator.name}' found for input field '#{binput.attr("name")}'."
-                binput.fwData("validators").push validator
+                Formwatcher.debug "Validator '#{validator.name}' found for input field '#{$input.attr("name")}'."
+                $input.fwData("validators").push validator
 
             Formwatcher.storeInitialValue elements
-            if binput.val() is null or not binput.val()
+            if $input.val() is null or not $input.val()
               bonzo(element).addClass "empty" for i, element of elements
 
             Formwatcher.removeName elements unless @options.submitUnchanged
@@ -110,7 +110,7 @@ class Watcher
     submitButtons = qwery "input[type=submit], button[type=''], button[type='submit'], button:not([type])", @form
     hiddenSubmitButtonElement = bonzo.create('<input type="hidden" name="" value="" />')[0]
 
-    @bonzoForm.append hiddenSubmitButtonElement
+    @$form.append hiddenSubmitButtonElement
 
     for element in submitButtons
       do (element) =>
@@ -151,12 +151,12 @@ class Watcher
       @callObservers "submit"
 
       # Do submit
-      @bonzoForm.addClass "submitting"
+      @$form.addClass "submitting"
       if @options.ajax
         @disableForm()
         @submitAjax()
       else
-        @bonzoForm.attr "action", @bonzoForm.fwData("originalAction")
+        @$form.attr "action", @$form.fwData("originalAction")
         setTimeout =>
           @form.submit()
           @disableForm()
@@ -174,26 +174,26 @@ class Watcher
 
   # `inlineValidating` specifies whether the user is still in the element, typing.
   validateElements: (elements, inlineValidating) ->
-    binput = bonzo elements.input
+    $input = bonzo elements.input
     validated = true
-    if binput.fwData("validators").length
+    if $input.fwData("validators").length
       # Only revalidated if the value has changed
-      if not inlineValidating or not binput.fwData("lastValidatedValue") or binput.fwData("lastValidatedValue") isnt binput.val()
-        binput.fwData "lastValidatedValue", binput.val()
-        Formwatcher.debug "Validating input " + binput.attr("name")
-        binput.fwData "validationErrors", []
+      if not inlineValidating or not $input.fwData("lastValidatedValue") or $input.fwData("lastValidatedValue") isnt $input.val()
+        $input.fwData "lastValidatedValue", $input.val()
+        Formwatcher.debug "Validating input " + $input.attr("name")
+        $input.fwData "validationErrors", []
 
-        for validator in binput.fwData "validators"
+        for validator in $input.fwData "validators"
 
-          if binput.val() is "" and validator.name isnt "Required"
+          if $input.val() is "" and validator.name isnt "Required"
             Formwatcher.debug "Validating #{validator.name}. Field was empty so continuing."
             continue
 
           Formwatcher.debug "Validating #{validator.name}"
-          validationOutput = validator.validate(binput.val(), elements.input)
+          validationOutput = validator.validate($input.val(), elements.input)
           if validationOutput isnt true
             validated = false
-            binput.fwData("validationErrors").push validationOutput
+            $input.fwData("validationErrors").push validationOutput
             break
 
         if validated
@@ -206,22 +206,22 @@ class Watcher
           # When we remove an error during inline editing, the error has to
           # be shown again when the user leaves the input field, even if
           # the actual value has not changed.
-          binput.fwData "forceValidationOnChange", true  if inlineValidating
+          $input.fwData "forceValidationOnChange", true  if inlineValidating
 
         else
 
           bonzo(element).removeClass "validated" for own i, element of elements
 
           unless inlineValidating
-            bonzo(elements.errors).html(binput.fwData("validationErrors").join("<br />")).show()
+            bonzo(elements.errors).html($input.fwData("validationErrors").join("<br />")).show()
             bonzo(element).addClass "error" for own i, element of elements
 
       if not inlineValidating and validated
-        formattedValue = binput.fwData("lastValidatedValue")
-        for validator in binput.fwData("validators")
+        formattedValue = $input.fwData("lastValidatedValue")
+        for validator in $input.fwData("validators")
           formattedValue = validator.format(formattedValue)
 
-        binput.val formattedValue
+        $input.val formattedValue
     else
       bonzo(element).addClass "validated" for own i, element of elements
 
@@ -259,7 +259,7 @@ class Watcher
       , 1
     else
       reqwest
-        url: @bonzoForm.fwData("originalAction")
+        url: @$form.fwData("originalAction")
         method: @options.ajaxMethod
         data: fields
         type: "text"
@@ -273,7 +273,7 @@ class Watcher
             @callObservers "success", request.response
             @ajaxSuccess()
         complete: (request) =>
-          @bonzoForm.removeClass "submitting"
+          @$form.removeClass "submitting"
           @callObservers "complete", request.response
 
   ajaxSuccess: ->
