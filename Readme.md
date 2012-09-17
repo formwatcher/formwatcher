@@ -28,17 +28,24 @@ Visit the [official site](http://www.formwatcher.org/) for a demo.
 
 ## Installation
 
-Simply install with [ender](http://ender.no.de):
+Simply install with [component](https://github.com/component/component):
 
-    ender build formwatcher
+    component install formwatcher/formwatcher
 
-or
+and include it in your source:
 
-    ender add formwatcher
+```javascript
+!function() {
+  var Formwatcher = require("formwatcher");
 
-You can also just download the `lib/` files, and install the dependencies manually, but I don't recommend it.
+  // Require any additional formwatcher components here, like:
+  require("validators");
+  require("hint");
 
-
+  // Optionally let Formwatcher discover all forms that have a `data-fw` field:
+  Formwatcher.discover();
+}()
+```
 
 ## Features
 
@@ -54,22 +61,18 @@ The **features** include:
 
 Formwatcher is tested with qunit and works in Safari, Chrome, Firefox, Opera and IE7+.
 
-> IE7 does not have a native `JSON` object. So if you intend to use AJAX with your form **and** want
-> to support IE7 you have to install [ender-json](https://github.com/amccollum/ender-json) as well.
 
+## Formwatcher components
 
-##Formwatcher modules
+Those are the components that can already exist and can be used with formwatcher:
 
-Those are the modules that can already exist and can be used with formwatcher:
-
-- `formwatcher-hint` Shows nice hints that fade out when the input field is focused.
-- `formwatcher-date-picker` Based on [CalEnder](https://github.com/ded/CalEnder)
+- [`formwatcher/validators`](https://github.com/formwatcher/validators) Basic validators for floats, integers, etc...
+- [`formwatcher/hint`](https://github.com/formwatcher/hint) Shows nice hints that fade out when the input field is focused.
+- [`formwatcher/dropdown`](https://github.com/formwatcher/dropdown) Converts select fields to nice dropdowns.
 - *more coming soon...*
 
-To install any of them simply use ender like this: `ender add formwatcher-hint` for example.
+Simply add them in your `component.json` file.
 
-To list all formwatcher modules in the npm registry you can simply
-[list all modules with the formwatcher tag](http://search.npmjs.org/#/_tag/formwatcher).
 
 
 ## Configuration
@@ -174,37 +177,43 @@ If you write your validator in coffeescript you can benefit from the
 functions. Please look at the source to see how it works.
 
 
+You should then add a `component.json` to your repository so it can be included properly.
+
+Don't forget to `require` it so it is «activated»:
+
+```javascript
+require("only-helloworld");
+```
+
 ## Writing your own Decorators
 
 
-Writing decorators is a bit more complex, but not difficult neither. The basic concept is again pushing instances of
-`Formwatcher.Decorator` to `Formwatcher.decorators`:
+Writing decorators is a bit more complex, but not difficult neither.
+The basic concept is again pushing classes to `Formwatcher.decorators`.
 
-    Formwatcher.decorators.push class extends Formwatcher.Decorator
+Decorators look like validators but instead of `validate()` and `format()`
+functions they have a `decorate()` function that has to return an object with
+all fields that have been generated and that should be updated with `.focus`,
+`.validated`, etc... classes.
+The object return **must** at least have an `input` field with the InputElement
+that holds the actual value to validate and submit. But it can be a new hidden
+field in case your decorator completely rebuilds the input.
 
-      name: "SomeDecorator"
-      description: "The description of the decorator"
-      nodeNames: [ "INPUT", "TEXTAREA" ]
-      defaultOptions:
-        myOption: "test"
 
-      accepts: (input) ->
-        if super input # The default implementation checks for classes and node names.
-          # Return true if this decorator should decorate this input field.
-          return true
-        false
+```javascript
 
-      decorate: (input) ->
-        # The decorate function has to return an object with all fields that have been generated and that should be updated
-        # with `.focus`, `.validated`, etc... classes.
-        # The `elements` object HAS TO contain at least `input` which is the field that will hold the actual value to be
-        # transmitted. (It can be changed to a hidden field)
-        elements = { input: input }
+myDecorator.prototype.decorate = function(input) {
+  var elements = { input: input };
 
-        # Here is your code to nicely wrap (or replace) the input field.
+  // Here is your code to nicely wrap (or replace) the input field.
 
-        return elements
+  return elements
+};
+```
 
-Take a look at the [built in hint decorator](https://github.com/enyo/formwatcher/blob/master/src/hint/hint.coffee) for a full example.
+Again, formwatcher provides a nice `Formwatcher.Decorator` class you can extend
+if you're writing your code in Coffeeescript.
+
+Take a look at the [hint decorator](https://github.com/formwatcher/hint) for a full example.
 
 
