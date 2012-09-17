@@ -132,6 +132,8 @@ Writing validators is very easy. A validator is a class that gets an `options`
 object and a `Watcher` instance in the constructor. The instance must have the
 field `name` and respond to the methods `accepts`, `validate`  and `format`.
 
+You can also optionally provide a `description`.
+
 To activate a validator it has to be pushed onto the `Formwatcher.validators`
 array.
 
@@ -144,6 +146,8 @@ function myValidator(options, watcher) {
 }
 
 myValidator.prototype.name = "only-helloworld";
+
+myValidator.prototype.description = "Makes sure the content is only 'Hello world'.";
 
 myValidator.prototype.accepts = function(input) {
   return input.className.indexOf("validate-only-hello-world") != -1;
