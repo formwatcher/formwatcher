@@ -7,18 +7,6 @@
       ]
     },
     {
-      "name": "lib/hint/package.json",
-      "regexs": [
-        "\"version\": \"###\""
-      ]
-    },
-    {
-      "name": "lib/date-picker/package.json",
-      "regexs": [
-        "\"version\": \"###\""
-      ]
-    },
-    {
       "name": "Readme.md",
       "regexs": [
         "Version ###"
@@ -35,18 +23,6 @@
       "regexs": [
         "Formwatcher Version ###",
         "version: \"###\""
-      ]
-    },
-    {
-      "name": "minified/formwatcher.js",
-      "regexs": [
-        "version:\"###\""
-      ]
-    },
-    {
-      "name": "minified/formwatcher.pack.js",
-      "regexs": [
-        "version:\"###\""
       ]
     },
     {
