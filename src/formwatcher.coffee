@@ -96,7 +96,7 @@ Formwatcher =
     $input = bonzo elements.input
 
     if $input.attr("id")
-      label = bonzo bonzo.create("""<label for="#{$input.attr("id")}"></label>""")[0]
+      label = bonzo qwery("""label[for="#{$input.attr("id")}"]""")[0]
       label = undefined unless label.length
 
     if not label and automatchLabel
