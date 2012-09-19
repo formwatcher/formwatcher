@@ -93,31 +93,31 @@ Formwatcher =
 
 
   getLabel: (elements, automatchLabel) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    if input.attr("id")
-      label = bonzo bonzo.create("label[for=" + input.attr("id") + "]")[0]
+    if $input.attr("id")
+      label = bonzo bonzo.create("""<label for="#{$input.attr("id")}"></label>""")[0]
       label = undefined unless label.length
 
     if not label and automatchLabel
-      parent = input.parent()
+      parent = $input.parent()
       if parent.nodeName == "LABEL"
         # The input is embedded inside a label, so take the first span element.
         label = qwery("span", parent)[0]
       else
-        label = input.previous()[0]
+        label = $input.previous()[0]
         label = undefined if label and (label.nodeName isnt "LABEL" or bonzo(label).attr("for")?)
 
     label
 
   changed: (elements, watcher) ->
-    input = bonzo elements.input
-    return  if not input.fwData("forceValidationOnChange") and (input.attr("type") is "checkbox" and input.fwData("previouslyChecked") is !!input[0].checked) or (input.fwData("previousValue") is input.val())
-    input.fwData "forceValidationOnChange", false
+    $input = bonzo elements.input
+    return  if not $input.fwData("forceValidationOnChange") and ($input.attr("type") is "checkbox" and $input.fwData("previouslyChecked") is !!$input[0].checked) or ($input.fwData("previousValue") is $input.val())
+    $input.fwData "forceValidationOnChange", false
 
     @setPreviousValueToCurrentValue elements
 
-    if (input.attr("type") is "checkbox") and (input.fwData("initialyChecked") isnt !!input[0].checked) or (input.attr("type") isnt "checkbox") and (input.fwData("initialValue") isnt input.val())
+    if ($input.attr("type") is "checkbox") and ($input.fwData("initialyChecked") isnt !!$input[0].checked) or ($input.attr("type") isnt "checkbox") and ($input.fwData("initialValue") isnt $input.val())
       Formwatcher.setChanged elements, watcher
     else
       Formwatcher.unsetChanged elements, watcher
@@ -125,74 +125,74 @@ Formwatcher =
     watcher.validateElements elements if watcher.options.validate
 
   setChanged: (elements, watcher) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    return if input.fwData("changed")
+    return if $input.fwData("changed")
 
     bonzo(element).addClass "changed" for own i, element of elements
 
-    input.fwData "changed", true
+    $input.fwData "changed", true
     Formwatcher.restoreName elements  unless watcher.options.submitUnchanged
     watcher.submitForm() if watcher.options.submitOnChange and watcher.options.ajax
 
   unsetChanged: (elements, watcher) ->
-    input = bonzo elements.input
-    return unless input.fwData("changed")
+    $input = bonzo elements.input
+    return unless $input.fwData("changed")
 
     bonzo(element).removeClass "changed" for own i, element of elements
 
-    input.fwData "changed", false
+    $input.fwData "changed", false
     Formwatcher.removeName elements unless watcher.options.submitUnchanged
 
   storeInitialValue: (elements) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    if input.attr("type") is "checkbox"
-      input.fwData "initialyChecked", !!input[0].checked
+    if $input.attr("type") is "checkbox"
+      $input.fwData "initialyChecked", !!$input[0].checked
     else
-      input.fwData "initialValue", input.val()
+      $input.fwData "initialValue", $input.val()
 
     @setPreviousValueToInitialValue elements
 
   restoreInitialValue: (elements) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    if input.attr("type") is "checkbox"
-      input.attr "checked", input.fwData("initialyChecked")
+    if $input.attr("type") is "checkbox"
+      $input.attr "checked", $input.fwData("initialyChecked")
     else
-      input.val input.fwData("initialValue")
+      $input.val $input.fwData("initialValue")
 
     @setPreviousValueToInitialValue elements
 
   setPreviousValueToInitialValue: (elements) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    if input.attr("type") is "checkbox"
-      input.fwData "previouslyChecked", input.fwData("initialyChecked")
+    if $input.attr("type") is "checkbox"
+      $input.fwData "previouslyChecked", $input.fwData("initialyChecked")
     else
-      input.fwData "previousValue", input.fwData("initialValue")
+      $input.fwData "previousValue", $input.fwData("initialValue")
 
   setPreviousValueToCurrentValue: (elements) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    if input.attr("type") is "checkbox"
-      input.fwData "previouslyChecked", !!input[0].checked
+    if $input.attr("type") is "checkbox"
+      $input.fwData "previouslyChecked", !!$input[0].checked
     else
-      input.fwData "previousValue", input.val()
+      $input.fwData "previousValue", $input.val()
 
   removeName: (elements) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    return if input.attr("type") is "checkbox"
+    return if $input.attr("type") is "checkbox"
 
-    input.fwData "name", input.attr("name") or ""  unless input.fwData("name")
-    input.attr "name", ""
+    $input.fwData "name", $input.attr("name") or ""  unless $input.fwData("name")
+    $input.attr "name", ""
 
   restoreName: (elements) ->
-    input = bonzo elements.input
+    $input = bonzo elements.input
 
-    return  if input.attr("type") is "checkbox"
-    input.attr "name", input.fwData("name")
+    return  if $input.attr("type") is "checkbox"
+    $input.attr "name", $input.fwData("name")
 
   decorators: []
   # `decorate()` only uses the first decorator found. You can't use multiple decorators on the same input.
