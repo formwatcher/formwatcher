@@ -1,6 +1,7 @@
 
 # Dependencies
 bonzo = require "bonzo"
+Formwatcher = require "./formwatcher"
 
 # ## The InputWatcher root class
 # 
