@@ -239,7 +239,7 @@ class Watcher
       # Buttons are only submitted when pressed. If a submit button triggers the submission
       # of the form then it creates a hidden input field to transmit it.
       if input[0].nodeName == "BUTTON" or (input[0].nodeName == "INPUT" and (input.attr("type").toLowerCase() == "submit" or input.attr("type").toLowerCase() == "button"))
-        return
+        continue
 
       # In previous versions I checked if the input field was hidden, and forced the submission
       # then. But if a decorator transforms any input field in a hidden field, and puts
