@@ -28,7 +28,6 @@ bonzo = require "bonzo"
 qwery = require "qwery"
 domready = require "domready"
 bean = require "bean"
-reqwest = require "reqwest"
 
 
 
