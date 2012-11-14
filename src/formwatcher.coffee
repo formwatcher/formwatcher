@@ -1,4 +1,4 @@
-# Formwatcher Version 0.0.2
+# Formwatcher Version 0.0.3
 #
 # More infos at http://www.formwatcher.org
 #
@@ -28,7 +28,6 @@ bonzo = require "bonzo"
 qwery = require "qwery"
 domready = require "domready"
 bean = require "bean"
-reqwest = require "reqwest"
 
 
 
@@ -53,7 +52,7 @@ bonzo.aug
 
 # ## Formwatcher, the global namespace
 Formwatcher =
-  version: "0.0.2"
+  version: "0.0.3"
   debugging: false
 
   # A wrapper for console.debug that only forwards if `Formwatcher.debugging == true`

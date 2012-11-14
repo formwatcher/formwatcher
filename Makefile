@@ -1,5 +1,5 @@
 
-build: components index.js
+build:
 	@component build --dev
 
 rebuild:
@@ -16,4 +16,4 @@ all:
 clean:
 	rm -fr build components
 
-.PHONY: clean
+.PHONY: clean build
