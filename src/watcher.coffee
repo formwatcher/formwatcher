@@ -266,8 +266,11 @@ class Watcher
           if res.error
             @callObservers "error", body
           else
-            @callObservers "success", body
-            @ajaxSuccess()
+            unless @options.responseCheck body
+              @callObservers "error", body
+            else
+              @callObservers "success", body
+              @ajaxSuccess()
           @$form.removeClass "submitting"
           @callObservers "complete", body
 
