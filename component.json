@@ -9,7 +9,7 @@
     "formwatcher/qwery": "*",
     "formwatcher/domready": "*",
     "formwatcher/bean": "*",
-    "formwatcher/reqwest": "*",
+    "visionmedia/superagent": "*",
     "enyo/json": "*"
   },
   "development": {},
