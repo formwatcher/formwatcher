@@ -12,13 +12,13 @@ It is written in [CoffeeScript][] and built with (and depends on):
   - [qwery][] (Selector Engine)
   - [bonzo][] (DOM utility)
   - [bean][] (Event utility)
-  - [reqwest][] (AJAX utility)
+  - [superagent][] (AJAX utility)
 
 [domready]: https://github.com/ded/domready
 [qwery]: https://github.com/ded/qwery
 [bonzo]: https://github.com/ded/bonzo
 [bean]: https://github.com/fat/bean
-[reqwest]: https://github.com/ded/reqwest
+[superagent]: http://visionmedia.github.com/superagent/
 
 [coffeescript]: http://coffeescript.org/
 
