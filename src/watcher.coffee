@@ -259,6 +259,7 @@ class Watcher
       , 1
     else
       request(@options.ajaxMethod, @$form.fwData("originalAction"))
+        .type("form") # To be compatible with no JS
         .send(fields)
         .end (res) =>
           body = res.body ? res.text
