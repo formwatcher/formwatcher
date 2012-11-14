@@ -1,4 +1,4 @@
-# Formwatcher Version 0.0.2-dev
+# Formwatcher Version 0.0.2
 #
 # More infos at http://www.formwatcher.org
 #
@@ -53,7 +53,7 @@ bonzo.aug
 
 # ## Formwatcher, the global namespace
 Formwatcher =
-  version: "0.0.2-dev"
+  version: "0.0.2"
   debugging: false
 
   # A wrapper for console.debug that only forwards if `Formwatcher.debugging == true`
