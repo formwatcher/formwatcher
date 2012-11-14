@@ -3,7 +3,7 @@
 Formwatcher = require "./formwatcher"
 bonzo = require "bonzo"
 qwery = require "qwery"
-reqwest = require "reqwest"
+request = require "superagent"
 bean = require "bean"
 
 
@@ -258,23 +258,17 @@ class Watcher
         @ajaxSuccess()
       , 1
     else
-      reqwest
-        url: @$form.fwData("originalAction")
-        method: @options.ajaxMethod
-        data: fields
-        type: "text"
-        error: (request) =>
-          @callObservers "error", request.response
-        success: (request) =>
-          @enableForm()
-          unless @options.responseCheck request.response
-            @callObservers "error", request.response
+      request(@options.ajaxMethod, @$form.fwData("originalAction"))
+        .send(fields)
+        .end (res) =>
+          body = res.body ? res.text
+          if res.error
+            @callObservers "error", body
           else
-            @callObservers "success", request.response
+            @callObservers "success", body
             @ajaxSuccess()
-        complete: (request) =>
           @$form.removeClass "submitting"
-          @callObservers "complete", request.response
+          @callObservers "complete", body
 
   ajaxSuccess: ->
     for elements in @allElements
