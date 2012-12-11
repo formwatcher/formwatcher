@@ -4,6 +4,7 @@ build:
 
 rebuild:
 	@make clean
+	@make components
 	@make build
 
 components:
