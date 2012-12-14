@@ -1,4 +1,4 @@
-# Formwatcher Version 0.0.5-dev
+# Formwatcher Version 0.0.5
 #
 # More infos at http://www.formwatcher.org
 #
@@ -52,7 +52,7 @@ bonzo.aug
 
 # ## Formwatcher, the global namespace
 Formwatcher =
-  version: "0.0.5-dev"
+  version: "0.0.5"
   debugging: false
 
   # A wrapper for console.debug that only forwards if `Formwatcher.debugging == true`
@@ -194,6 +194,11 @@ Formwatcher =
     $input.attr "name", $input.fwData("name")
 
   decorators: []
+
+  addDecorator: (decorator) ->
+    @decorators.push decorator
+    @debug "Added decorator '#{decorator::name}'."
+
   # `decorate()` only uses the first decorator found. You can't use multiple decorators on the same input.
   # You can extend an existing decorator with inheritence though.
   decorate: (watcher, input) ->
