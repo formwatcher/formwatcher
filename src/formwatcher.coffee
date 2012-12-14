@@ -216,6 +216,10 @@ Formwatcher =
       input: input
 
   validators: []
+  addValidator: (validator) ->
+    @validators.push validator
+    @debug "Added validator '#{validator::name}'."
+
   currentWatcherId: 0
   watchers: []
   add: (watcher) ->
