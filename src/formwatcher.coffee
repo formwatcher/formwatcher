@@ -195,9 +195,9 @@ Formwatcher =
 
   decorators: []
 
-  addDecorator: (decorator) ->
+  registerDecorator: (decorator) ->
     @decorators.push decorator
-    @debug "Added decorator '#{decorator::name}'."
+    @debug "Registered decorator '#{decorator::name}'."
 
   # `decorate()` only uses the first decorator found. You can't use multiple decorators on the same input.
   # You can extend an existing decorator with inheritence though.
@@ -216,9 +216,9 @@ Formwatcher =
       input: input
 
   validators: []
-  addValidator: (validator) ->
+  registerValidator: (validator) ->
     @validators.push validator
-    @debug "Added validator '#{validator::name}'."
+    @debug "Register validator '#{validator::name}'."
 
   currentWatcherId: 0
   watchers: []
