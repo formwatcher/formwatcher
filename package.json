@@ -1,6 +1,6 @@
 {
   "name": "formwatcher",
-  "version": "0.0.5",
+  "version": "0.0.6-dev",
   "description": "Unobtrusively improve forms with JavaScript.",
   "homepage": "http://www.formwatcher.org",
   "tags": [ "formwatcher" ],
