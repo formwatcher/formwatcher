@@ -194,6 +194,11 @@ Formwatcher =
     $input.attr "name", $input.fwData("name")
 
   decorators: []
+
+  addDecorator: (decorator) ->
+    @decorators.push decorator
+    @debug "Added decorator '#{decorator::name}'."
+
   # `decorate()` only uses the first decorator found. You can't use multiple decorators on the same input.
   # You can extend an existing decorator with inheritence though.
   decorate: (watcher, input) ->
