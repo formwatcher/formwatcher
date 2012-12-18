@@ -254,7 +254,6 @@ class Watcher
 
     if fieldCount is 0 and not @options.submitFormIfAllUnchanged
       setTimeout =>
-        @enableForm()
         @ajaxSuccess()
       , 1
     else
@@ -275,6 +274,7 @@ class Watcher
           @callObservers "complete", body
 
   ajaxSuccess: ->
+    @enableForm()
     for elements in @allElements
       Formwatcher.unsetChanged elements, @
       if @options.resetFormAfterSubmit
